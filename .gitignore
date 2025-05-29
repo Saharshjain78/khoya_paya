@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -16,27 +15,161 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Virtual Environment
+# Virtual environments
+.env
+.venv
+env/
 venv/
 ENV/
-env/
+env.bak/
+venv.bak/
 
-# Database
-*.sqlite3
-.venv/
-# Node.js
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Temporary and log files
+*.log
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Backup files
+*.bak
+*.backup
+
+# Database files (keep structure but ignore actual data)
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+
+# Image and media files (optional - uncomment if you want to ignore them)
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.bmp
+# photos/
+# known_faces/
+
+# User profile data
+user_profiles/
+
+# Unnecessary application files (keeping only main.py as final app)
+advanced_face_app_complete.py
+advanced_face_app_with_profiles.py
+advanced_face_app_enhanced_fixed.py
+advanced_face_app.py
+app.py
+streamlit_app_fixed.py
+streamlit_app.py
+program.py
+
+# Test and development files
+test_*.py
+*_test.py
+quick_test.py
+simple_test.py
+test_face_profile_feature.py
+test_profile_feature.py
+test_profiles.py
+
+# CLI and batch files
+cli_face_verification.py
+run_face_verification.bat
+
+# Database management utilities
+check_current_schema.py
+check_db.py
+create_db.py
+database_creator.py
+database_viewer.py
+fix_database_v2.py
+fix_database.py
+init_database.py
+manual_fix.py
+migrate_database.py
+verify_database.py
+
+# Development and demo files
+add_image_gui.py
+add_image.py
+create_demo_profiles.py
+demo_face_verification.py
+
+# Live recognition variants (keeping only the main app)
+live_recognition_direct.py
+live_recognition_enhanced.py
+live_recognition_fixed.py
+live_recognition_improved.py
+live_recognition.py
+
+# Upload and verification utilities
+upload_face_verification.py
+streamlit_face_verification.py
+
+# Documentation and readme files for specific features
+ENHANCED_PROFILES_README.md
+FACE_VERIFICATION_README.md
+
+# Webapp subdirectory (if not needed)
+webapp/
+
+# System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Windows specific
+*.lnk
+
+# Streamlit specific
+.streamlit/
+
+# Model files and cache
+*.model
+*.pkl
+*.pickle
+cache/
+
+# Logs and monitoring
+logs/
+*.log
+
+# Node.js (if applicable)
 node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
 
-# IDEs and editors
-.idea/
-.vscode/
-*.swp
-*.swo
-.DS_Store
+# Configuration files (uncomment if you have sensitive config)
+# config.ini
+# settings.json
+# .env
+
+# Keep these essential files:
+# main.py (final application)
+# requirements.txt
+# README.md
+# LICENSE
