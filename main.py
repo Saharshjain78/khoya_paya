@@ -238,17 +238,48 @@ class FaceRecognitionManager:
         """Extract face encoding from image using face_recognition library"""
         try:
             if isinstance(image, Image.Image):
+                # Convert PIL image to RGB if it's not already
+                if image.mode == 'RGBA':
+                    # Convert RGBA to RGB by creating a white background
+                    background = Image.new('RGB', image.size, (255, 255, 255))
+                    background.paste(image, mask=image.split()[-1])  # Use alpha channel as mask
+                    image = background
+                elif image.mode not in ['RGB', 'L']:
+                    # Convert any other mode to RGB
+                    image = image.convert('RGB')
+                
                 image_array = np.array(image)
             else:
                 image_array = image
             
+            # Ensure the image is in the correct data type
             if image_array.dtype != np.uint8:
-                image_array = (image_array * 255).astype(np.uint8)
+                if image_array.dtype in [np.float32, np.float64]:
+                    # If it's floating point, assume it's normalized to 0-1
+                    image_array = (image_array * 255).astype(np.uint8)
+                else:
+                    # For other types, just convert to uint8
+                    image_array = image_array.astype(np.uint8)
             
-            if len(image_array.shape) == 3 and image_array.shape[2] == 3:
-                rgb_image = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
+            # Handle different image shapes
+            if len(image_array.shape) == 3:
+                if image_array.shape[2] == 4:  # RGBA
+                    # Convert RGBA to RGB
+                    rgb_image = cv2.cvtColor(image_array, cv2.COLOR_RGBA2RGB)
+                elif image_array.shape[2] == 3:  # RGB or BGR
+                    # Check if it's BGR and convert to RGB
+                    rgb_image = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
+                else:
+                    return None, f"Unsupported number of channels: {image_array.shape[2]}"
+            elif len(image_array.shape) == 2:  # Grayscale
+                # Convert grayscale to RGB
+                rgb_image = cv2.cvtColor(image_array, cv2.COLOR_GRAY2RGB)
             else:
-                rgb_image = image_array
+                return None, f"Unsupported image shape: {image_array.shape}"
+            
+            # Ensure the image is 8-bit
+            if rgb_image.dtype != np.uint8:
+                rgb_image = rgb_image.astype(np.uint8)
             
             face_locations = face_recognition.face_locations(rgb_image)
             
@@ -774,18 +805,22 @@ def photo_recognition():
     
     uploaded_file = st.file_uploader(
         "Upload an image for recognition",
-        type=['jpg', 'jpeg', 'png', 'bmp'],
-        help="Upload an image containing a face to recognize"
+        type=['jpg', 'jpeg', 'png', 'bmp', 'tiff', 'tif', 'webp'],
+        help="Upload an image containing a face to recognize (supports JPG, PNG, BMP, TIFF, WebP)"
     )
     
     if uploaded_file is not None:
         try:
+            # Open and validate the image
             image = Image.open(uploaded_file)
+            
+            # Display image info for debugging
+            st.info(f"Image format: {image.format}, Mode: {image.mode}, Size: {image.size}")
             
             col1, col2 = st.columns(2)
             
             with col1:
-                st.image(image, caption="Uploaded Image", use_column_width=True)
+                st.image(image, caption="Uploaded Image", use_container_width=True)
             
             with col2:
                 if st.button("🔍 Recognize Face", type="primary"):
@@ -858,7 +893,7 @@ def live_recognition():
             col1, col2 = st.columns(2)
             
             with col1:
-                st.image(image, caption="Captured Image", use_column_width=True)
+                st.image(image, caption="Captured Image", use_container_width=True)
             
             with col2:
                 with st.spinner("Recognizing face..."):
@@ -936,8 +971,8 @@ def face_database_management():
             
             uploaded_file = st.file_uploader(
                 "Upload Face Image *",
-                type=['jpg', 'jpeg', 'png', 'bmp'],
-                help="Upload a clear image of the person's face"
+                type=['jpg', 'jpeg', 'png', 'bmp', 'tiff', 'tif', 'webp'],
+                help="Upload a clear image of the person's face (supports JPG, PNG, BMP, TIFF, WebP)"
             )
             
             submit_button = st.form_submit_button("Add to Database")
@@ -946,6 +981,13 @@ def face_database_management():
                 if name and uploaded_file:
                     try:
                         image = Image.open(uploaded_file)
+                        
+                        # Display image info for validation
+                        st.info(f"Image format: {image.format}, Mode: {image.mode}, Size: {image.size}")
+                        
+                        # Show preview of the image
+                        st.image(image, caption="Image Preview", use_container_width=True, width=200)
+                        
                         success, message = face_manager.add_face_to_database(
                             name=name,
                             image=image,
@@ -1102,7 +1144,7 @@ def face_database_management():
             col1, col2 = st.columns([1, 1])
             
             with col1:
-                st.image(image, caption="Captured Image", use_column_width=True)
+                st.image(image, caption="Captured Image", use_container_width=True)
             
             with col2:
                 with st.form("live_add_form"):
